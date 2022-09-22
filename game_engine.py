@@ -86,12 +86,12 @@ class Herd():
             toAgent.herd[animal] += transferAmount
 
 class Player(Herd):
-    def __init__(self, idN = None, bankRef = None, game_type = "standard", random_generator = random.Random()) -> None:
+    def __init__(self, idN = None, bankRef = None, gameType = "standard", randomGenerator = random.Random()) -> None:
 
         self.bankRef = bankRef
         self.idN = idN
-        self.game_type = game_type
-        self.random_generator = random_generator
+        self.gameType = gameType
+        self.randomGenerator = randomGenerator
 
         self.herd = {
             "rabbit" : 0,
@@ -104,38 +104,38 @@ class Player(Herd):
             "bigDog"   : 0
         }
 
-        if(self.game_type == "dynamic"):
+        if(self.gameType == "dynamic"):
             self.transferFromBank({"rabbit": 1})
     
     def roll(self):
-        die_orange = \
+        dieOrange = \
               ["horse"]      \
             + ["fox"]        \
             + ["pig"]    * 2 \
             + ["sheep"]  * 2 \
             + ["rabbit"] * 6
 
-        die_blue = \
+        dieBlue = \
               ["wolf"]       \
             + ["cow"]        \
             + ["pig"]        \
             + ["sheep"]  * 3 \
             + ["rabbit"] * 6
 
-        return [self.random_generator.choice(die_orange), self.random_generator.choice(die_blue)]
+        return [self.randomGenerator.choice(dieOrange), self.randomGenerator.choice(dieBlue)]
 
-    def transferAllToBank(self, animal_list):
-        def dict_filter(d, names):
+    def transferAllToBank(self, animalList):
+        def dictFilter(d, names):
             return dict(filter(lambda x: x[0] in names, d.items()))
 
-        self.transferToBank(dict_filter(self.herd, animal_list))
+        self.transferToBank(dictFilter(self.herd, animalList))
 
     def foxAttack(self):
         if(self.herd["smallDog"]):
             self.transferAllToBank(["smallDog"])
         else:
             self.transferAllToBank(["rabbit"])
-            if(self.game_type == "dynamic"):
+            if(self.gameType == "dynamic"):
                 self.transferFromBank({"rabbit": 1})
                 
 
@@ -143,7 +143,7 @@ class Player(Herd):
         if(self.herd["bigDog"]):
             self.transferAllToBank(["bigDog"])
         else:
-            if(self.game_type == "dynamic"):
+            if(self.gameType == "dynamic"):
                 self.transferAllToBank(["sheep", "pig", "cow"])
             else:
                 self.transferAllToBank(["rabbit", "sheep", "pig", "cow"])

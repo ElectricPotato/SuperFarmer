@@ -5,7 +5,7 @@ in a standard game, if fox and wolf is rolled symultaniously, both dogs are used
 '''
 
 import random
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Tuple, Type
 
 from datetime import datetime
 
@@ -14,14 +14,10 @@ N_PLAYERS = 1
 
 GAME_TYPE = "standard" # or "dynamic"
 
-#TODO: break this out to seperate files
-
 from game_engine import *
 
 
-TradePartner = Union[GameBank, Player]
-
-def strategy1_Simple(player: Player, gameBank: GameBank, otherPlayers: List[Player]) -> Optional[Tuple[TradePartner, Dict, Dict]]:
+def strategy1_Simple(player: Player, gameBank: GameBank, otherPlayers: List[Player]) -> Optional[Tuple[Type[Herd], Dict, Dict]]:
 
     trades = [
         (lambda : player.herdHasAtLeast({"cow":    3}), (gameBank, {"cow":    2}, {"horse":    1})),
@@ -43,17 +39,18 @@ def strategy1_Simple(player: Player, gameBank: GameBank, otherPlayers: List[Play
 def runGame():
     gameRunning = True
 
-    Rseed = int(datetime.now().timestamp()*1000000)
-    random_generator = random.Random()
-    random_generator.seed(Rseed)
-    print(f"seed {Rseed}")
+    randSeed = int(datetime.now().timestamp()*1000000)
+    randomGenerator = random.Random()
+    randomGenerator.seed(randSeed)
+    print(f"seed {randSeed}")
 
     gameBank = GameBank()
     players = [
         Player(
             idN = i,
             bankRef = gameBank,
-            random_generator = random_generator
+            gameType = GAME_TYPE,
+            randomGenerator = randomGenerator
         )
         for i in range(N_PLAYERS)
     ]
@@ -107,7 +104,8 @@ def runGame():
         gameRound += 1
         print()
 
-        if(gameRound > 400): break
+        if(gameRound > 400):
+            break
 
     return gameRound
 
