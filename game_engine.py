@@ -20,8 +20,8 @@ class GameType(Enum):
 
 
 class Herd():
-    def __init__(self) -> None:
-        self.herd = {}
+    def __init__(self, herd = {}) -> None:
+        self.herd = herd
 
     def herdToTradePoints(herd):
         # trade points
@@ -104,23 +104,26 @@ class Herd():
             toAgent.herd[animal] += transferAmount
 
 class Player(Herd):
-    def __init__(self, idN = None, bankRef = None, gameType = GameType.standard, randomGenerator = random.Random()) -> None:
+    def __init__(self, herd = None, idN = None, bankRef = None, gameType = GameType.standard, randomGenerator = random.Random()) -> None:
 
         self.bankRef = bankRef
         self.idN = idN
         self.gameType = gameType
         self.randomGenerator = randomGenerator
 
-        self.herd = {
-            An.rabbit : 0,
-            An.sheep  : 0,
-            An.pig    : 0,
-            An.cow    : 0,
-            An.horse  : 0,
-            
-            An.smallDog : 0,
-            An.bigDog   : 0
-        }
+        if(herd is None):
+            self.herd = {
+                An.rabbit : 0,
+                An.sheep  : 0,
+                An.pig    : 0,
+                An.cow    : 0,
+                An.horse  : 0,
+                
+                An.smallDog : 0,
+                An.bigDog   : 0
+            }
+        else:
+            self.herd = herd
 
         if(self.gameType == GameType.dynamic):
             self.transferFromBank({An.rabbit: 1})
@@ -211,14 +214,17 @@ class Player(Herd):
 
 
 class GameBank(Herd):
-    def __init__(self) -> None:
-        self.herd = {
-            An.rabbit : 60,
-            An.sheep  : 24,
-            An.pig    : 20,
-            An.cow    : 12,
-            An.horse  :  4,
+    def __init__(self, herd = None) -> None:
+        if(herd is None):
+            self.herd = {
+                An.rabbit : 60,
+                An.sheep  : 24,
+                An.pig    : 20,
+                An.cow    : 12,
+                An.horse  :  4,
 
-            An.smallDog : 4,
-            An.bigDog   : 2
-        }
+                An.smallDog : 4,
+                An.bigDog   : 2
+            }
+        else:
+            self.herd = herd
