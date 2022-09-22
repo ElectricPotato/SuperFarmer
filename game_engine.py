@@ -134,7 +134,6 @@ class Player(Herd):
             if(self.game_type == "dynamic"):
                 self.transferToBank({"rabbit": max(self.herd["rabbit"] -1, 0) })
             else:
-                self.herd["rabbit"] = 0
                 self.transferToBank({"rabbit": self.herd["rabbit"]})
 
     def wolfAttack(self): #todo: transfer to bank
