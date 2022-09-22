@@ -15,7 +15,7 @@ class Herd():
         # smallDog = 6
         # bigDog = 36
 
-        #win = 1+6+12+36+72
+        #win = 1+6+12+36+72 = 127
 
         tradePoints = {}
         tradePoints["rabbit"] = 1
@@ -56,10 +56,10 @@ class Herd():
         elif(not acceptUnfairTrade and not otherAgent.herdHasAtLeast(theirAnimals)):
             failReason = "other side doesnt have enough animals"
 
-        elif("smallDog" in theirAnimals and theirAnimals["smallDog"] and self.herd["smallDog"] > 0):
+        elif("smallDog" in theirAnimals and theirAnimals["smallDog"] > 0 and self.herd["smallDog"] > 0):
             failReason = "player already has a small dog"
 
-        elif("bigDog" in theirAnimals and theirAnimals["bigDog"] and self.herd["bigDog"] > 0):
+        elif("bigDog" in theirAnimals and theirAnimals["bigDog"] > 0 and self.herd["bigDog"] > 0):
             failReason = "player already has a big dog"
 
         else:
@@ -89,11 +89,8 @@ class Player(Herd):
     def __init__(self, idN = None, bankRef = None, game_type = "standard", random_generator = random.Random()) -> None:
 
         self.bankRef = bankRef
-
         self.idN = idN
-
         self.game_type = game_type
-
         self.random_generator = random_generator
 
         self.herd = {
@@ -127,26 +124,29 @@ class Player(Herd):
 
         return [self.random_generator.choice(die_orange), self.random_generator.choice(die_blue)]
 
-    def foxAttack(self): #todo: transfer to bank
-        if(self.herd["smallDog"]):
-            self.transferToBank({"smallDog": self.herd["smallDog"]})
-        else:
-            if(self.game_type == "dynamic"):
-                self.transferToBank({"rabbit": max(self.herd["rabbit"] -1, 0) })
-            else:
-                self.transferToBank({"rabbit": self.herd["rabbit"]})
-
-    def wolfAttack(self): #todo: transfer to bank
+    def transferAllToBank(self, animal_list):
         def dict_filter(d, names):
             return dict(filter(lambda x: x[0] in names, d.items()))
 
+        self.transferToBank(dict_filter(self.herd, animal_list))
+
+    def foxAttack(self):
+        if(self.herd["smallDog"]):
+            self.transferAllToBank(["smallDog"])
+        else:
+            self.transferAllToBank(["rabbit"])
+            if(self.game_type == "dynamic"):
+                self.transferFromBank({"rabbit": 1})
+                
+
+    def wolfAttack(self):
         if(self.herd["bigDog"]):
-            self.transferToBank({"bigDog": self.herd["bigDog"]})
+            self.transferAllToBank(["bigDog"])
         else:
             if(self.game_type == "dynamic"):
-                self.transferToBank(dict_filter(self.herd, ["sheep", "pig", "cow"]))
+                self.transferAllToBank(["sheep", "pig", "cow"])
             else:
-                self.transferToBank(dict_filter(self.herd, ["rabbit", "sheep", "pig", "cow"]))
+                self.transferAllToBank(["rabbit", "sheep", "pig", "cow"])
 
             
 
