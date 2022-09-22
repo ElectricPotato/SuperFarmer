@@ -8,11 +8,47 @@ class An(Enum): #animal
     pig      = auto()
     cow      = auto()
     horse    = auto()
+
     smallDog = auto()
     bigDog   = auto()
 
     fox      = auto() #not used in herds
     wolf     = auto()
+
+    def __str__(self):
+        return {
+            An.rabbit   :'R',
+            An.sheep    :'S',
+            An.pig      :'P',
+            An.cow      :'C',
+            An.horse    :'H',
+
+            An.smallDog :'d',
+            An.bigDog   :'D',
+
+            An.fox      :'f',
+            An.wolf     :'w',
+        }[self]
+
+    def __repr__(self) -> str: #this is not the best solution, but its easy
+        return self.__str__()
+
+    def longName(self):
+        return {
+            An.rabbit   :'Rabbit',
+            An.sheep    :'Sheep',
+            An.pig      :'Pig',
+            An.cow      :'Cow',
+            An.horse    :'Horse',
+
+            An.smallDog :'Small Dog',
+            An.bigDog   :'Big Dog',
+            
+            An.fox      :'Fox',
+            An.wolf     :'Wolf',
+        }[self]
+
+
 
 class GameType(Enum):
     standard = auto()
@@ -22,6 +58,10 @@ class GameType(Enum):
 class Herd():
     def __init__(self, herd = {}) -> None:
         self.herd = herd
+
+
+    def herdToStr(self):
+        return ', '.join(f"{animal} {self.herd[animal]}" for animal in [An.rabbit, An.sheep, An.pig, An.cow, An.horse, An.smallDog, An.bigDog])
 
     def herdToTradePoints(herd):
         # trade points
@@ -127,6 +167,12 @@ class Player(Herd):
 
         if(self.gameType == GameType.dynamic):
             self.transferFromBank({An.rabbit: 1})
+
+    def __str__(self) -> str:
+        return f"player {i}"
+
+    def herdToStr(self):
+        return super().herdToStr() + f", {self.tradePoints()}/127"
     
     def roll(self):
         dieOrange = \
@@ -228,3 +274,6 @@ class GameBank(Herd):
             }
         else:
             self.herd = herd
+
+    def __str__(self) -> str:
+        return "bank"

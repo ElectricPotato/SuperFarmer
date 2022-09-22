@@ -1,8 +1,9 @@
-from game_engine import *
+from game_engine import An, Player, GameBank, Herd
 from typing import Dict, List, Optional, Tuple, Type
 
 def strategy1_Simple(player: Player, gameBank: GameBank, otherPlayers: List[Player]) -> Optional[Tuple[Type[Herd], Dict, Dict]]:
 
+    #trade format: (otherAgent, yourAnimals, theirAnimals)
     trades = [
         (lambda : player.herdHasAtLeast({An.cow:    3}), (gameBank, {An.cow:    2}, {An.horse:    1})),
         (lambda : player.herdHasAtLeast({An.cow:    2}), (gameBank, {An.cow:    1}, {An.bigDog:   1})),

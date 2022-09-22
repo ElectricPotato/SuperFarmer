@@ -2,98 +2,96 @@
 notes:
 in a standard game, if fox and wolf is rolled symultaniously, both dogs are used up even though the wolf already took the rabbits, so the small dog gets taken away while it has nothing to protect
 
+trade before roll
+single trade destination, single animal to be exchanged for multiple or vice versa, not multiple for multiple
+you are allowed to trade dogs back and forth
 '''
 from game_engine import *
-from player_strategies import *
+import player_strategies as ps
 
 from typing import Dict, List, Optional, Tuple, Type
-
 from datetime import datetime
+import random
 
 #players: 2 - 4
-N_PLAYERS = 1
-
-GAME_TYPE = GameType.standard
 
 
 
-
-
-def runGame():
-    gameRunning = True
-
+def newRandom():
     randSeed = int(datetime.now().timestamp()*1000000)
     randomGenerator = random.Random()
     randomGenerator.seed(randSeed)
+
+    return randomGenerator, randSeed
+
+def runGame(gameType, playerStrategies, maxRounds):
+    gameRunning = True
+
+    randomGenerator, randSeed = newRandom()
     print(f"seed {randSeed}")
+
+    nPlayers = len(playerStrategies)
 
     gameBank = GameBank()
     players = [
         Player(
             idN = i,
             bankRef = gameBank,
-            gameType = GAME_TYPE,
+            gameType = gameType,
             randomGenerator = randomGenerator
         )
-        for i in range(N_PLAYERS)
+        for i in range(nPlayers)
     ]
 
+    results = [-1] * nPlayers # the number of rounds each player won in, -1 means maxRounds exceeded
 
-
-    gameRound = 1
-    while(gameRunning):
-        gameRunning = True
-        for i, player in enumerate(players):
+    for gameRound in range(maxRounds):
+        gameRunning = False
+        print(f"--- Round {gameRound} ---")
+        for i, player, playerStrategy in zip(range(nPlayers), players, playerStrategies):
             if(player.hasWon()):
                 continue
 
-            print(player.herd, f"{player.tradePoints()}/127")
-
-            #gameRunning = True
-
-            #trade before roll
-            #single trade destination, single animal to be exchanged for multiple or vice versa, not multiple for multiple
-            #you are allowed to trade dogs back and forth
+            print(f"player {i}: {player.herdToStr()}")
 
             otherPlayers = list(filter(lambda x: x is not player, players))
-            #TODO: store which strategy the player is using inside GameState class 
-            currentTrade = strategy1_Simple(player, gameBank, otherPlayers)
+            currentTrade = playerStrategy(player, gameBank, otherPlayers)
             if currentTrade is not None:
                 player.trade(*currentTrade)
 
                 if(player.hasWon()):
-                    print(f"player {i} has won in round {gameRound}")
-                    print(player.herd, f"{player.tradePoints()}/127")
-                    gameRunning = False
+                    print(f"player {i} has won in round {gameRound}: {player.herdToStr()}")
+                    results[i] = gameRound
                     continue
 
             roll = player.roll()
             #roll = ["rabbit", "rabbit"]
             player.executeRoll(roll)
-            print(f"trade {currentTrade}")
-            print(f"roll {roll}")
-            
+
+            if(currentTrade is not None):
+                otherAgent, yourAnimals, theirAnimals = currentTrade
+                print(f"player {i} trades {yourAnimals} for {otherAgent}'s {theirAnimals}")
+            print(f"player {i} rolls {roll[0]} {roll[1]}")
 
             if(player.hasWon()):
-                print(f"player {i} has won in round {gameRound}")
-                print(player.herd, f"{player.tradePoints()}/127")
-                gameRunning = False
+                print(f"player {i} has won in round {gameRound}: {player.herdToStr()}")
                 continue
-
             if(player.canWin()):
-                print(f"player {i} can win next turn")
-                print(player.herd, f"{player.tradePoints()}/127")
+                print(f"player {i} can win next turn: {player.herdToStr()}")
 
-        gameRound += 1
-        print()
+            gameRunning = True
 
-        if(gameRound > 400):
-            print(gameBank.herd)
+        if(not gameRunning):
             break
 
-    return gameRound
+    print("--- Game End ---")
+    return results
 
-for i in range(100):
-    if(runGame() >= 390):
-        print("this run seems to have broken somehow")
-        break
+print("legend:")
+print('\n'.join(f' {animal.__str__()}: {animal.longName()}' for animal in An))
+print()
+
+for i in range(1):
+    results = runGame(GameType.standard, [ps.strategy1_Simple], 400)
+    print(results)
+
