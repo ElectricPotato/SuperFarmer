@@ -4,8 +4,8 @@ in a standard game, if fox and wolf is rolled symultaniously, both dogs are used
 
 '''
 from game_engine import *
+from player_strategies import *
 
-import random
 from typing import Dict, List, Optional, Tuple, Type
 
 from datetime import datetime
@@ -17,24 +17,7 @@ GAME_TYPE = GameType.standard
 
 
 
-def strategy1_Simple(player: Player, gameBank: GameBank, otherPlayers: List[Player]) -> Optional[Tuple[Type[Herd], Dict, Dict]]:
 
-    trades = [
-        (lambda : player.herdHasAtLeast({An.cow:    3}), (gameBank, {An.cow:    2}, {An.horse:    1})),
-        (lambda : player.herdHasAtLeast({An.cow:    2}), (gameBank, {An.cow:    1}, {An.bigDog:   1})),
-        (lambda : player.herdHasAtLeast({An.pig:    4}), (gameBank, {An.pig:    3}, {An.cow:      1})),
-        (lambda : player.herdHasAtLeast({An.sheep:  3}), (gameBank, {An.sheep:  2}, {An.pig:      1})),
-        (lambda : player.herdHasAtLeast({An.sheep:  2}), (gameBank, {An.sheep:  1}, {An.smallDog: 1})),
-        (lambda : player.herdHasAtLeast({An.rabbit: 7}), (gameBank, {An.rabbit: 6}, {An.sheep:    1}))
-    ]
-
-    for condition, trade in trades:
-        if condition() and player.isTradePossible(*trade):
-            return trade
-
-    return None
-
-    #this strategy breaks if fox eats everything: {'rabbit': 0, 'sheep': 24, 'pig': 20, 'cow': 12, 'horse': 4, 'smallDog': 1, 'bigDog': 1}
 
 def runGame():
     gameRunning = True
@@ -110,7 +93,7 @@ def runGame():
 
     return gameRound
 
-while(1):
+for i in range(100):
     if(runGame() >= 390):
         print("this run seems to have broken somehow")
         break
