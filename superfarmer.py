@@ -22,34 +22,21 @@ from game_engine import *
 TradePartner = Union[GameBank, Player]
 
 def strategy1_Simple(player: Player, gameBank: GameBank, otherPlayers: List[Player]) -> Optional[Tuple[TradePartner, Dict, Dict]]:
-    tradeDestination = gameBank
 
-    #def tryTradeAndLeaveOne(tradeYourAnimals, tradeTheirAnimals):
+    trades = [
+        (lambda : player.herdHasAtLeast({"cow":    3}), (gameBank, {"cow":    2}, {"horse":    1})),
+        (lambda : player.herdHasAtLeast({"cow":    2}), (gameBank, {"cow":    1}, {"bigDog":   1})),
+        (lambda : player.herdHasAtLeast({"pig":    4}), (gameBank, {"pig":    3}, {"cow":      1})),
+        (lambda : player.herdHasAtLeast({"sheep":  3}), (gameBank, {"sheep":  2}, {"pig":      1})),
+        (lambda : player.herdHasAtLeast({"sheep":  2}), (gameBank, {"sheep":  1}, {"smallDog": 1})),
+        (lambda : player.herdHasAtLeast({"rabbit": 7}), (gameBank, {"rabbit": 6}, {"sheep":    1}))
+    ]
 
-    #trades = 
+    for condition, trade in trades:
+        if condition() and player.isTradePossible(*trade):
+            return trade
 
-    if(player.herdHasAtLeast({"cow":    3}) and gameBank.herdHasAtLeast({"horse":    1})):
-        tradeYourAnimals, tradeTheirAnimals = {"cow":    2}, {"horse":    1}
-
-    elif(player.herdHasAtLeast({"cow":    2}) and gameBank.herdHasAtLeast({"bigDog":   1}) and player.herd["bigDog"] == 0):
-        tradeYourAnimals, tradeTheirAnimals = {"cow":    1}, {"bigDog":   1}
-
-    elif(player.herdHasAtLeast({"pig":    4}) and gameBank.herdHasAtLeast({"cow":      1})):
-        tradeYourAnimals, tradeTheirAnimals = {"pig":    3}, {"cow":      1}
-
-    elif(player.herdHasAtLeast({"sheep":  3}) and gameBank.herdHasAtLeast({"pig":      1})):
-        tradeYourAnimals, tradeTheirAnimals = {"sheep":  2}, {"pig":      1}
-
-    elif(player.herdHasAtLeast({"sheep":  2}) and gameBank.herdHasAtLeast({"smallDog": 1}) and player.herd["smallDog"] == 0):
-        tradeYourAnimals, tradeTheirAnimals = {"sheep":  1}, {"smallDog": 1}
-
-    elif(player.herdHasAtLeast({"rabbit": 7}) and gameBank.herdHasAtLeast({"sheep":    1})):
-        tradeYourAnimals, tradeTheirAnimals = {"rabbit": 6}, {"sheep":    1}
-
-    else:
-        return None
-
-    return (tradeDestination, tradeYourAnimals, tradeTheirAnimals)
+    return None
 
     #this strategy breaks if fox eats everything: {'rabbit': 0, 'sheep': 24, 'pig': 20, 'cow': 12, 'horse': 4, 'smallDog': 1, 'bigDog': 1}
 
