@@ -92,6 +92,11 @@ print('\n'.join(f' {animal.__str__()}: {animal.longName()}' for animal in An))
 print()
 
 for i in range(1):
-    results = runGame(GameType.standard, [ps.strategy1_Simple], 400)
+    gameType = GameType.standard
+    playerStrategies = [ps.strategy1_Simple]
+    maxRounds = 400
+
+    print(f"gameType: {gameType.name}, Players: {','.join(map(lambda x: x.__name__, playerStrategies))}, maxRounds: {maxRounds}")
+    results = runGame(gameType, playerStrategies, maxRounds)
     print(results)
 
