@@ -3,6 +3,7 @@ notes:
 in a standard game, if fox and wolf is rolled symultaniously, both dogs are used up even though the wolf already took the rabbits, so the small dog gets taken away while it has nothing to protect
 
 '''
+from game_engine import *
 
 import random
 from typing import Dict, List, Optional, Tuple, Type
@@ -12,20 +13,19 @@ from datetime import datetime
 #players: 2 - 4
 N_PLAYERS = 1
 
-GAME_TYPE = "standard" # or "dynamic"
+GAME_TYPE = GameType.standard
 
-from game_engine import *
 
 
 def strategy1_Simple(player: Player, gameBank: GameBank, otherPlayers: List[Player]) -> Optional[Tuple[Type[Herd], Dict, Dict]]:
 
     trades = [
-        (lambda : player.herdHasAtLeast({"cow":    3}), (gameBank, {"cow":    2}, {"horse":    1})),
-        (lambda : player.herdHasAtLeast({"cow":    2}), (gameBank, {"cow":    1}, {"bigDog":   1})),
-        (lambda : player.herdHasAtLeast({"pig":    4}), (gameBank, {"pig":    3}, {"cow":      1})),
-        (lambda : player.herdHasAtLeast({"sheep":  3}), (gameBank, {"sheep":  2}, {"pig":      1})),
-        (lambda : player.herdHasAtLeast({"sheep":  2}), (gameBank, {"sheep":  1}, {"smallDog": 1})),
-        (lambda : player.herdHasAtLeast({"rabbit": 7}), (gameBank, {"rabbit": 6}, {"sheep":    1}))
+        (lambda : player.herdHasAtLeast({An.cow:    3}), (gameBank, {An.cow:    2}, {An.horse:    1})),
+        (lambda : player.herdHasAtLeast({An.cow:    2}), (gameBank, {An.cow:    1}, {An.bigDog:   1})),
+        (lambda : player.herdHasAtLeast({An.pig:    4}), (gameBank, {An.pig:    3}, {An.cow:      1})),
+        (lambda : player.herdHasAtLeast({An.sheep:  3}), (gameBank, {An.sheep:  2}, {An.pig:      1})),
+        (lambda : player.herdHasAtLeast({An.sheep:  2}), (gameBank, {An.sheep:  1}, {An.smallDog: 1})),
+        (lambda : player.herdHasAtLeast({An.rabbit: 7}), (gameBank, {An.rabbit: 6}, {An.sheep:    1}))
     ]
 
     for condition, trade in trades:
@@ -105,6 +105,7 @@ def runGame():
         print()
 
         if(gameRound > 400):
+            print(gameBank.herd)
             break
 
     return gameRound

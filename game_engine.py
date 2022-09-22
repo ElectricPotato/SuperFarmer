@@ -1,5 +1,24 @@
 import random
 
+from enum import Enum, auto
+
+class An(Enum): #animal
+    rabbit   = auto()
+    sheep    = auto()
+    pig      = auto()
+    cow      = auto()
+    horse    = auto()
+    smallDog = auto()
+    bigDog   = auto()
+
+    fox      = auto() #not used in herds
+    wolf     = auto()
+
+class GameType(Enum):
+    standard = auto()
+    dynamic  = auto()
+
+
 class Herd():
     def __init__(self) -> None:
         self.herd = {}
@@ -18,14 +37,13 @@ class Herd():
         #win = 1+6+12+36+72 = 127
 
         tradePoints = {}
-        tradePoints["rabbit"] = 1
-        tradePoints["sheep"]  = tradePoints["rabbit"] * 6
-        tradePoints["pig"]    = tradePoints["sheep"]  * 2
-        tradePoints["cow"]    = tradePoints["pig"]    * 3
-        tradePoints["horse"]  = tradePoints["cow"]    * 2
-
-        tradePoints["smallDog"] = tradePoints["sheep"]
-        tradePoints["bigDog"]   = tradePoints["cow"]
+        tradePoints[An.rabbit]   = 1
+        tradePoints[An.sheep]    = tradePoints[An.rabbit] * 6
+        tradePoints[An.pig]      = tradePoints[An.sheep]  * 2
+        tradePoints[An.cow]      = tradePoints[An.pig]    * 3
+        tradePoints[An.horse]    = tradePoints[An.cow]    * 2
+        tradePoints[An.smallDog] = tradePoints[An.sheep]
+        tradePoints[An.bigDog]   = tradePoints[An.cow]
 
         total = sum(herd[animal] * tradePoints[animal] for animal in herd)
 
@@ -56,10 +74,10 @@ class Herd():
         elif(not acceptUnfairTrade and not otherAgent.herdHasAtLeast(theirAnimals)):
             failReason = "other side doesnt have enough animals"
 
-        elif("smallDog" in theirAnimals and theirAnimals["smallDog"] > 0 and self.herd["smallDog"] > 0):
+        elif(An.smallDog in theirAnimals and theirAnimals[An.smallDog] > 0 and self.herd[An.smallDog] > 0):
             failReason = "player already has a small dog"
 
-        elif("bigDog" in theirAnimals and theirAnimals["bigDog"] > 0 and self.herd["bigDog"] > 0):
+        elif(An.bigDog in theirAnimals and theirAnimals[An.bigDog] > 0 and self.herd[An.bigDog] > 0):
             failReason = "player already has a big dog"
 
         else:
@@ -86,7 +104,7 @@ class Herd():
             toAgent.herd[animal] += transferAmount
 
 class Player(Herd):
-    def __init__(self, idN = None, bankRef = None, gameType = "standard", randomGenerator = random.Random()) -> None:
+    def __init__(self, idN = None, bankRef = None, gameType = GameType.standard, randomGenerator = random.Random()) -> None:
 
         self.bankRef = bankRef
         self.idN = idN
@@ -94,33 +112,33 @@ class Player(Herd):
         self.randomGenerator = randomGenerator
 
         self.herd = {
-            "rabbit" : 0,
-            "sheep"  : 0,
-            "pig"    : 0,
-            "cow"    : 0,
-            "horse"  : 0,
+            An.rabbit : 0,
+            An.sheep  : 0,
+            An.pig    : 0,
+            An.cow    : 0,
+            An.horse  : 0,
             
-            "smallDog" : 0,
-            "bigDog"   : 0
+            An.smallDog : 0,
+            An.bigDog   : 0
         }
 
-        if(self.gameType == "dynamic"):
-            self.transferFromBank({"rabbit": 1})
+        if(self.gameType == GameType.dynamic):
+            self.transferFromBank({An.rabbit: 1})
     
     def roll(self):
         dieOrange = \
-              ["horse"]      \
-            + ["fox"]        \
-            + ["pig"]    * 2 \
-            + ["sheep"]  * 2 \
-            + ["rabbit"] * 6
+              [An.horse]      \
+            + [An.fox]        \
+            + [An.pig]    * 2 \
+            + [An.sheep]  * 2 \
+            + [An.rabbit] * 6
 
         dieBlue = \
-              ["wolf"]       \
-            + ["cow"]        \
-            + ["pig"]        \
-            + ["sheep"]  * 3 \
-            + ["rabbit"] * 6
+              [An.wolf]       \
+            + [An.cow]        \
+            + [An.pig]        \
+            + [An.sheep]  * 3 \
+            + [An.rabbit] * 6
 
         return [self.randomGenerator.choice(dieOrange), self.randomGenerator.choice(dieBlue)]
 
@@ -131,22 +149,22 @@ class Player(Herd):
         self.transferToBank(dictFilter(self.herd, animalList))
 
     def foxAttack(self):
-        if(self.herd["smallDog"]):
-            self.transferAllToBank(["smallDog"])
+        if(self.herd[An.smallDog]):
+            self.transferAllToBank([An.smallDog])
         else:
-            self.transferAllToBank(["rabbit"])
-            if(self.gameType == "dynamic"):
-                self.transferFromBank({"rabbit": 1})
+            self.transferAllToBank([An.rabbit])
+            if(self.gameType == GameType.dynamic):
+                self.transferFromBank({An.rabbit: 1})
                 
 
     def wolfAttack(self):
-        if(self.herd["bigDog"]):
-            self.transferAllToBank(["bigDog"])
+        if(self.herd[An.bigDog]):
+            self.transferAllToBank([An.bigDog])
         else:
-            if(self.gameType == "dynamic"):
-                self.transferAllToBank(["sheep", "pig", "cow"])
+            if(self.gameType == GameType.dynamic):
+                self.transferAllToBank([An.sheep, An.pig, An.cow])
             else:
-                self.transferAllToBank(["rabbit", "sheep", "pig", "cow"])
+                self.transferAllToBank([An.rabbit, An.sheep, An.pig, An.cow])
 
             
 
@@ -157,10 +175,10 @@ class Player(Herd):
 
     def executeRoll(self, roll):
         attack = False
-        if("wolf" in roll):
+        if(An.wolf in roll):
             self.wolfAttack()
             attack = True
-        if("fox" in roll):
+        if(An.fox in roll):
             self.foxAttack()
             attack = True
         
@@ -168,19 +186,19 @@ class Player(Herd):
             self.breedPairs(roll)
 
     def hasWon(self) -> bool:
-        return self.herd["rabbit"] \
-           and self.herd["sheep"]  \
-           and self.herd["pig"]    \
-           and self.herd["cow"]    \
-           and self.herd["horse"]
+        return self.herd[An.rabbit] \
+           and self.herd[An.sheep]  \
+           and self.herd[An.pig]    \
+           and self.herd[An.cow]    \
+           and self.herd[An.horse]
 
     def canWin(self) -> bool:
         winningHerd = {
-            "rabbit" : 1,
-            "sheep"  : 1,
-            "pig"    : 1,
-            "cow"    : 1,
-            "horse"  : 1,
+            An.rabbit : 1,
+            An.sheep  : 1,
+            An.pig    : 1,
+            An.cow    : 1,
+            An.horse  : 1,
         }
         
         return self.tradePoints() >= Herd.herdToTradePoints(winningHerd)
@@ -195,12 +213,12 @@ class Player(Herd):
 class GameBank(Herd):
     def __init__(self) -> None:
         self.herd = {
-            "rabbit" : 60,
-            "sheep"  : 24,
-            "pig"    : 20,
-            "cow"    : 12,
-            "horse"  :  4,
+            An.rabbit : 60,
+            An.sheep  : 24,
+            An.pig    : 20,
+            An.cow    : 12,
+            An.horse  :  4,
 
-            "smallDog" : 4,
-            "bigDog"   : 2
+            An.smallDog : 4,
+            An.bigDog   : 2
         }
